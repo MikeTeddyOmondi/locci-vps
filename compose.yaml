@@ -1,0 +1,108 @@
+name: "fc-vps"
+
+services:
+  firecracker-vps:
+    build: .
+    container_name: firecracker-vps-api
+    privileged: true # Required for network management and VM creation
+    ports:
+      - "8080:8080"
+    volumes:
+      # Persistent storage for VMs
+      - firecracker_vms:/var/lib/firecracker-vms
+      - firecracker_images:/var/lib/firecracker/images
+      - firecracker_logs:/var/log/firecracker
+      # Mount /dev for TAP device creation
+      - /dev:/dev
+      # Optional: host networking for better performance
+      - /sys:/sys:ro
+    environment:
+      # API Configuration
+      - API_PORT=8080
+      - VM_DIR=/var/lib/firecracker-vms
+      - BASE_IMAGES_DIR=/var/lib/firecracker/images
+
+      # Firecracker Configuration
+      - KERNEL_PATH=/var/lib/firecracker/vmlinux.bin
+      - FIRECRACKER_VERSION=v1.4.1
+      - FIRECRACKER_ARCH=x86_64
+
+      # Network Configuration
+      - NETWORK_BRIDGE=br0
+      - NETWORK_SUBNET=192.168.100.0/24
+      - BRIDGE_IP=192.168.100.1/24
+
+      # Resource Limits
+      - MAX_VMS_PER_HOST=100
+
+      # Kernel version for download
+      - KERNEL_VERSION=5.10.186
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - firecracker-network
+
+  # Optional: Prometheus for monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: firecracker-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=200h"
+      - "--web.enable-lifecycle"
+    networks:
+      - firecracker-network
+    profiles:
+      - monitoring
+
+  # Optional: Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: firecracker-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - firecracker-network
+    profiles:
+      - monitoring
+
+volumes:
+  firecracker_vms:
+    driver: local
+  firecracker_images:
+    driver: local
+  firecracker_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  firecracker-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+

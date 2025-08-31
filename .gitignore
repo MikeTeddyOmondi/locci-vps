@@ -1,0 +1,6 @@
+**/*target/
+**/*.env
+bin/
+firecracker-vps
+tmp/
+lib/

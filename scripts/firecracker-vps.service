@@ -1,0 +1,55 @@
+[Unit]
+Description=Firecracker VPS Management API Server
+Documentation=https://github.com/MikeTeddyOmondi/firecracker-vps
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=firecracker
+Group=firecracker
+ExecStart=/usr/local/bin/firecracker-vps
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=5
+StartLimitIntervalSec=0
+
+# Environment variables
+Environment=API_PORT=8080
+Environment=VM_DIR=/var/lib/firecracker-vms
+Environment=BASE_IMAGES_DIR=/var/lib/firecracker/images
+Environment=KERNEL_PATH=/var/lib/firecracker/vmlinux.bin
+Environment=NETWORK_BRIDGE=br0
+Environment=NETWORK_SUBNET=192.168.100.0/24
+Environment=MAX_VMS_PER_HOST=100
+
+# Working directory
+WorkingDirectory=/var/lib/firecracker-vms
+
+# Security settings
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/firecracker-vms /var/lib/firecracker /var/log/firecracker /tmp
+PrivateTmp=true
+ProtectKernelTunables=false
+ProtectKernelModules=false
+ProtectControlGroups=false
+RestrictRealtime=true
+RestrictSUIDSGID=true
+
+# Capabilities required for network management and VM creation
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_SYS_ADMIN CAP_DAC_OVERRIDE
+AmbientCapabilities=CAP_NET_ADMIN CAP_SYS_ADMIN CAP_DAC_OVERRIDE
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=firecracker-vps
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=32768
+
+[Install]
+WantedBy=multi-user.target
