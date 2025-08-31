@@ -274,15 +274,16 @@ func (vmm *VMManager) StartVM(vmID string) error {
 			VcpuCount:  firecracker.Int64(int64(vm.CPU)),
 			MemSizeMib: firecracker.Int64(int64(vm.Memory)),
 		},
-		JailerCfg: &firecracker.JailerConfig{
-			GID:           firecracker.Int(1000),
-			UID:           firecracker.Int(1000),
-			ID:            vmID,
-			NumaNode:      firecracker.Int(0),
-			ExecFile:      "/usr/bin/firecracker",
-			JailerBinary:  "/usr/bin/jailer",
-			ChrootBaseDir: "/var/lib/firecracker",
-		},
+		// JailerCfg: &firecracker.JailerConfig{
+		// 	GID:           firecracker.Int(1000),
+		// 	UID:           firecracker.Int(1000),
+		// 	ID:            vmID,
+		// 	NumaNode:      firecracker.Int(0),
+		// 	ExecFile:      "/usr/bin/firecracker",
+		// 	JailerBinary:  "/usr/bin/jailer",
+		// 	ChrootBaseDir: "/var/lib/firecracker",
+		// },
+		JailerCfg: nil,
 	}
 
 	ctx := context.Background()
