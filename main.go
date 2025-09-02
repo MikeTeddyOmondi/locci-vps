@@ -248,6 +248,7 @@ func (vmm *VMManager) StartVM(vmID string) error {
 	}
 
 	// Configure Firecracker
+	// TODO: decide on CNI or Static network config (disabled CNI config)
 	cfg := firecracker.Config{
 		SocketPath:      vm.SocketPath,
 		KernelImagePath: vm.KernelPath,
@@ -261,10 +262,10 @@ func (vmm *VMManager) StartVM(vmID string) error {
 			},
 		},
 		NetworkInterfaces: []firecracker.NetworkInterface{{
-			CNIConfiguration: &firecracker.CNIConfiguration{
-				NetworkName: "default",
-				IfName:      "eth0",
-			},
+			// CNIConfiguration: &firecracker.CNIConfiguration{
+			// 	NetworkName: "default",
+			// 	IfName:      "eth0",
+			// },
 			StaticConfiguration: &firecracker.StaticNetworkConfiguration{
 				MacAddress:  generateMacAddress(),
 				HostDevName: vm.TapDevice,
