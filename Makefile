@@ -7,6 +7,8 @@ GO_MODULE=firecracker-vps
 DOCKER_IMAGE=firecracker-vps:latest
 API_PORT=8080
 
+USER := $(shell whoami)
+
 GOBIN_PATH := $(shell go env GOBIN)
 ifeq ($(GOBIN_PATH),)
     GOBIN_PATH := $(shell go env GOPATH)/bin
@@ -129,6 +131,10 @@ install: build-all ## Install binaries to system
 
 install-service: install ## Install as systemd service
 	@echo "$(BLUE)Installing systemd service...$(NC)"
+	@sudo mkdir -p /var/log/firecracker
+	@sudo sudo chgrp firecracker /var/log/firecracker
+	@sudo sudo chmod 775 /var/log/firecracker
+	@sudo sudo usermod -a -G firecracker $(USER)
 	@sudo cp scripts/firecracker-vps.service /etc/systemd/system/
 	@sudo systemctl daemon-reload
 	@sudo systemctl enable firecracker-vps
