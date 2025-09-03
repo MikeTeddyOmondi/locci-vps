@@ -297,7 +297,23 @@ func (vmm *VMManager) StartVM(vmID string) error {
 		FullTimestamp:   true,
 	})
 
-	m, err := firecracker.NewMachine(ctx, cfg, firecracker.WithLogger(logger.WithContext(ctx)))
+	// Use the firecracker binary (custom path)
+	// cmd := firecracker.VMCommandBuilder{}.WithSocketPath(socketFile).WithBin(filepath.Join(dir, "firecracker")).Build(ctx)
+	// m, err := firecracker.NewMachine(ctx, cfg, sdk.WithProcessRunner(cmd), firecracker.WithSnapshot(memPath, snapPath))
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	dir := "/usr/local/bin"
+
+	opts := []firecracker.Opt{
+		firecracker.WithProcessRunner(
+			firecracker.VMCommandBuilder{}.WithSocketPath(vm.SocketPath).WithBin(filepath.Join(dir, "firecracker")).Build(ctx),
+		),
+	}
+
+	// m, err := firecracker.NewMachine(ctx, cfg, firecracker.WithLogger(logger.WithContext(ctx)))
+	m, err := firecracker.NewMachine(ctx, cfg, opts...)
 	if err != nil {
 		return fmt.Errorf("failed to create machine: %v", err)
 	}
