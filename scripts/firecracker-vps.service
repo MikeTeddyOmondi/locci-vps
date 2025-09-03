@@ -1,6 +1,6 @@
 [Unit]
 Description=Firecracker VPS Management API Server
-Documentation=https://github.com/MikeTeddyOmondi/firecracker-vps
+Documentation=https://github.com/MikeTeddyOmondi/locci-vps
 After=network.target
 Wants=network.target
 
