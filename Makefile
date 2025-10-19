@@ -130,17 +130,17 @@ install: build-all ## Install binaries to system
 	@echo "$(YELLOW)Run '$(CLI_BINARY) health' to test installation$(NC)"
 
 install-service: install ## Install as systemd service
-  @echo "$(BLUE)Installing systemd service...$(NC)"
-  @sudo groupadd -f firecracker
-  @sudo mkdir -p /var/log/firecracker
-  @sudo chgrp firecracker /var/log/firecracker
-  @sudo chmod 775 /var/log/firecracker
-  @sudo usermod -a -G firecracker $(USER)
-  @sudo cp scripts/firecracker-vps.service /etc/systemd/system/
-  @sudo systemctl daemon-reload
-  @sudo systemctl enable firecracker-vps
-  @echo "$(GREEN)✓ Service installed$(NC)"
-  @echo "$(YELLOW)Start with: sudo systemctl start firecracker-vps$(NC)"
+	@echo "$(BLUE)Installing systemd service...$(NC)"
+	@sudo groupadd -f firecracker
+	@sudo mkdir -p /var/log/firecracker
+	@sudo chgrp firecracker /var/log/firecracker
+	@sudo chmod 775 /var/log/firecracker
+	@sudo usermod -a -G firecracker $(USER)
+	@sudo cp scripts/firecracker-vps.service /etc/systemd/system/
+	@sudo systemctl daemon-reload
+	@sudo systemctl enable firecracker-vps
+	@echo "$(GREEN)✓ Service installed$(NC)"
+	@echo "$(YELLOW)Start with: sudo systemctl start firecracker-vps$(NC)"
 	
 ##@ Images and Setup
 download-kernel: ## Download Firecracker kernel
