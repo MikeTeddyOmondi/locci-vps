@@ -145,7 +145,7 @@ install-service: install ## Install as systemd service
 download-kernel: ## Download Firecracker kernel
 	@echo "$(BLUE)Downloading Firecracker kernel...$(NC)"
 	@mkdir -p /var/lib/firecracker/
-	@curl -L https://s3.amazonaws.com/spec.ccfc.min/img/quickstart_guide/5.10.225/vmlinux.bin \
+	@sudo curl -S -L https://s3.amazonaws.com/spec.ccfc.min/firecracker-ci/v1.10/$(arch)/vmlinux-5.10.223 \
 		-o /var/lib/firecracker/vmlinux.bin
 	@echo "$(GREEN)✓ Kernel downloaded to /var/lib/firecracker/vmlinux.bin$(NC)"
 

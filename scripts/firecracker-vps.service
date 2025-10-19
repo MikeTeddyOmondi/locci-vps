@@ -12,7 +12,7 @@ ExecStart=/usr/local/bin/firecracker-vps
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 RestartSec=5
-StartLimitIntervalSec=0
+StartLimitInterval=0
 
 # Environment variables
 Environment=API_PORT=8080
